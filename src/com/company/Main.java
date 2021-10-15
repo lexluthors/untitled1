@@ -82,7 +82,8 @@ public class Main {
                 qfqdayArray = codeJson.getAsJsonArray("day");
             }
 
-            float diyitianPrice = Float.parseFloat(qfqdayArray.get(0).getAsJsonArray().get(2).getAsString());
+            //按照开盘价计算
+            float diyitianPrice = Float.parseFloat(qfqdayArray.get(0).getAsJsonArray().get(1).getAsString());
             ArrayList<Float> prices = new ArrayList<>();
             prices.add(diyitianPrice);
 
