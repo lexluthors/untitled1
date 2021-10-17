@@ -11,15 +11,13 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedHashMap;
+import java.util.*;
 
 public class Main {
 
     public static void main(String[] args) {
         //string=股票代码, list包含所有天数的价格,1,3,5,7日期的价格
-        LinkedHashMap<String, ArrayList<Float>> allStockData = new LinkedHashMap<>();
+        LinkedHashMap<String, List<Float>> allStockData = new LinkedHashMap<>();
 
 	// write your code here
         String allCode = "2021/8/4 601236\n" +
@@ -84,12 +82,15 @@ public class Main {
 
             //按照开盘价计算
             float diyitianPrice = Float.parseFloat(qfqdayArray.get(0).getAsJsonArray().get(1).getAsString());
-            ArrayList<Float> prices = new ArrayList<>();
+            List<Float> prices = new ArrayList<>();
             prices.add(diyitianPrice);
-
             for (int i1 = 0; i1 < qfqdayArray.size(); i1++) {
                 float cha = 0;
                 String baifenbi = "0%";
+                //zuigaojia
+                if (i1<31){
+                    prices.add(Float.parseFloat(qfqdayArray.get(i1).getAsJsonArray().get(3).getAsString()));
+                }
 //                System.out.println(qfqdayArray.get(i1).getAsJsonArray().get(2).getAsString());
                 switch (i1){
                     case 1:
@@ -100,7 +101,7 @@ public class Main {
                     case 8:
                     case 12:
                     case 20:
-                        prices.add(Float.parseFloat(qfqdayArray.get(i1).getAsJsonArray().get(2).getAsString()));
+
                         cha =  (Float.parseFloat(qfqdayArray.get(i1).getAsJsonArray().get(2).getAsString())-diyitianPrice)/diyitianPrice*100;
                         baifenbi =stockBean.getCode()+"股票"+i1+"天后的涨幅: "+ cha +"%";
                         System.out.println(baifenbi);
@@ -108,6 +109,7 @@ public class Main {
                 }
             }
             allStockData.put(stockBean.getCode(),prices);
+
             try {
                 Thread.sleep(300);
             } catch (InterruptedException e) {
@@ -115,6 +117,21 @@ public class Main {
             }
         }
 
+
+        Set<String> set = allStockData.keySet();
+        for (String key:set){
+
+            List<Float> prs = allStockData.get(key);
+            int postion = 1;
+            float tempPrice = 0;
+            for (int i1 = 1; i1 < prs.size(); i1++) {
+                if (prs.get(i1)>tempPrice){
+                    tempPrice = prs.get(i1);
+                    postion = i1;
+                }
+            }
+            System.out.println("股票"+key+"最高价格是"+tempPrice+"在第"+postion+"天" + "涨幅"+ (tempPrice-prs.get(0))/prs.get(0)*100+"%");
+        }
 //        String url = "https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param=sz000636,day,2021-8-27,2021-10-11,500,qfq";
 //        Gson gson = new Gson();
 //        JsonParser jsonParser = new JsonParser();
